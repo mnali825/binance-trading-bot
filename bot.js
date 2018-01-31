@@ -4,8 +4,7 @@ binance.options({
   'APISECRET':'uQp8M62dDDylqBvAwvqfNVIgsScOZEXnp4lnxZ0wF2WoamQt2eLQgvMfbVEIchhc'
 });
 
-// const TI = require('technicalindicators');
-// TI.setConfig('precision', 10);
+var TI = require('technicalindicators');
 
 var balance = 10000;
 var portfolio = [];
@@ -44,7 +43,7 @@ binance.candlesticks("BTCUSDT", "2h", (err, ticks, symbol) => {
     let { e:eventType, E:eventTime, s:symbol, k:ticks } = candlesticks;
     let { o:open, h:high, l:low, c:close, v:volume, n:trades, i:interval, x:isFinal, q:quoteVolume, V:buyVolume, Q:quoteBuyVolume } = ticks;
 
-    times.push(time);
+    times.push(eventTime);
     opens.push(open);
     closes.push(close);
     highs.push(high);
@@ -52,7 +51,49 @@ binance.candlesticks("BTCUSDT", "2h", (err, ticks, symbol) => {
     volumes.push(volume);
 
     // Technical analysis
+
+    var oneDay = getCandleSticks(opens,highs,closes,lows,1);
+    var twoDay = getCandleSticks(opens,highs,closes,lows,2);
+    var threeDay = getCandleSticks(opens,highs,closes,lows,3);
+
+    var bullishEngulfing = TI.bullishengulfingpattern(twoDay);
+    var doji = TI.doji(oneDay);
+    var dragonflyDoji = TI.dragonflydoji(oneDay);
+    var bullishHarami = TI.bullishharami(twoDay);
+    var bullishHaramiCross = TI.bullishharamicross(twoDay);
+    var bullishMarubozu = TI.bullishmarubozu(getCandleSticks(closes,opens,highs,lows,1));
+    var bullishSpinningTop = TI.bullishspinningtop(oneDay);
+    var threeWhiteSoldiers = TI.threewhitesoldiers(threeDay);
+
+    var bearishEngulfing = TI.bearishengulfingpattern(twoDay);
+    var bearishHaramiCross = TI.bearishharamicross(twoDay);
+    var bearishMarubozu = TI.bearishmarubozu(getCandleSticks(closes,opens,highs,lows,1));
+    var bearishSpinningTop = TI.bearishspinningtop(oneDay);
+
+    var threeBlackCrows = TI.threeblackcrows(threeDay);
+    var gravestoneDoji = TI.gravestonedoji(oneDay);
+    var darkCloudCover = TI.darkcloudcover(twoDay);
+    var piercing = TI.piercingline(twoDay);
+    var eveningStar = TI.eveningstar(threeDay);
+    var morningStar = TI.morningstar(threeDay);
+
+    // var bullish = TI.bullish(twoDay);
+    // var bearish = TI.bearish(twoDay);
     
+    
+    
+
+    // console.log(times);
+    console.log(bullishEngulfing, doji, gravestoneDoji, dragonflyDoji, bearishEngulfing, bullishHarami, bullishHaramiCross, bearishHaramiCross, bullishMarubozu, bullishSpinningTop, bearishMarubozu, bearishSpinningTop, darkCloudCover, piercing, eveningStar, morningStar, threeBlackCrows, threeWhiteSoldiers);
   });
 
 }, {limit:3});
+
+function getCandleSticks(o,h,c,l, n) {
+  return {
+      open: o.slice(-n),
+      high: h.slice(-n),
+      close: c.slice(-n),
+      low: l.slice(-n)
+    }
+}
