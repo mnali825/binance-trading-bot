@@ -19,7 +19,7 @@ function sell(ticker, amount, price) {
 }
 
 // Intervals: 1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
-binance.candlesticks("BTCUSDT", "2h", (err, ticks, symbol) => {
+binance.candlesticks("BTCUSDT", "15m", (err, ticks, symbol) => {
   var times = [];
   var opens = [];
   var closes = [];
@@ -56,35 +56,51 @@ binance.candlesticks("BTCUSDT", "2h", (err, ticks, symbol) => {
     var twoDay = getCandleSticks(opens,highs,closes,lows,2);
     var threeDay = getCandleSticks(opens,highs,closes,lows,3);
 
+    // Good
     var bullishEngulfing = TI.bullishengulfingpattern(twoDay);
-    var doji = TI.doji(oneDay);
     var dragonflyDoji = TI.dragonflydoji(oneDay);
     var bullishHarami = TI.bullishharami(twoDay);
     var bullishHaramiCross = TI.bullishharamicross(twoDay);
     var bullishMarubozu = TI.bullishmarubozu(getCandleSticks(closes,opens,highs,lows,1));
     var bullishSpinningTop = TI.bullishspinningtop(oneDay);
     var threeWhiteSoldiers = TI.threewhitesoldiers(threeDay);
+    var morningStar = TI.morningstar(threeDay);
+    var piercing = TI.piercingline(twoDay);
 
+    // Reversal
+    var doji = TI.doji(oneDay);
+
+    // Bad
     var bearishEngulfing = TI.bearishengulfingpattern(twoDay);
     var bearishHaramiCross = TI.bearishharamicross(twoDay);
     var bearishMarubozu = TI.bearishmarubozu(getCandleSticks(closes,opens,highs,lows,1));
     var bearishSpinningTop = TI.bearishspinningtop(oneDay);
-
     var threeBlackCrows = TI.threeblackcrows(threeDay);
     var gravestoneDoji = TI.gravestonedoji(oneDay);
     var darkCloudCover = TI.darkcloudcover(twoDay);
-    var piercing = TI.piercingline(twoDay);
     var eveningStar = TI.eveningstar(threeDay);
-    var morningStar = TI.morningstar(threeDay);
 
-    // var bullish = TI.bullish(twoDay);
-    // var bearish = TI.bearish(twoDay);
-    
-    
-    
+    // Create array for indicator flag, and indicator weight
+    var bullishIndicators = [bullishEngulfing,dragonflyDoji,bullishHarami,bullishHaramiCross,bullishMarubozu,bullishSpinningTop,threeWhiteSoldiers,morningStar,piercing];
+    var bullishWeight = [1,2,1,1,1,1,3,1,1];
 
-    // console.log(times);
-    console.log(bullishEngulfing, doji, gravestoneDoji, dragonflyDoji, bearishEngulfing, bullishHarami, bullishHaramiCross, bearishHaramiCross, bullishMarubozu, bullishSpinningTop, bearishMarubozu, bearishSpinningTop, darkCloudCover, piercing, eveningStar, morningStar, threeBlackCrows, threeWhiteSoldiers);
+    var bearishInidicators = [bearishEngulfing,bearishHaramiCross,bearishMarubozu,bearishSpinningTop,threeBlackCrows,gravestoneDoji,darkCloudCover,eveningStar];
+    var bearishWeights = [1,1,1,1,3,2,1,1];
+
+    bullishIndicators.forEach(function(ind, i) {
+      if (ind) {
+        aggregate+=bullishWeight[i];
+      }
+    });
+
+    bearishInidicators.forEach(function(ind, i) {
+      if (ind) {
+        aggregate-=bearishWeights[i];
+      }
+    });
+
+    console.log(aggregate);
+    // console.log(bullishEngulfing, doji, gravestoneDoji, dragonflyDoji, bearishEngulfing, bullishHarami, bullishHaramiCross, bearishHaramiCross, bullishMarubozu, bullishSpinningTop, bearishMarubozu, bearishSpinningTop, darkCloudCover, piercing, eveningStar, morningStar, threeBlackCrows, threeWhiteSoldiers);
   });
 
 }, {limit:3});
