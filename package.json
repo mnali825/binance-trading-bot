@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/mnali825/binance-trading-bot#readme",
   "dependencies": {
+    "async": "^2.6.0",
     "babel-polyfill": "^6.26.0",
     "node-binance-api": "^0.4.7",
     "technicalindicators": "^1.1.1"
